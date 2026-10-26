@@ -1,7 +1,7 @@
 # LingoWorld — Launch Kit
 
 Everything below is ready to copy. Wherever it says LINK, use this public link:
-https://muse.ai/s/lingoworld-cxc6dx0xj2xixfxoxo/So3SYNsvcExGX1FvCWXACNEcwPizaW9CF7YEBIOS_LQ
+https://marshaad708-coder.github.io/lingoworld/
 
 ## GitHub repo
 

@@ -4,7 +4,7 @@
 
 A free translator for the languages of the whole world — with one special mode nobody else built in.
 
-Live demo: https://muse.ai/s/lingoworld-cxc6dx0xj2xixfxoxo/So3SYNsvcExGX1FvCWXACNEcwPizaW9CF7YEBIOS_LQ
+Live demo: https://marshaad708-coder.github.io/lingoworld/
 
 Video: *(paste your video link here)*
 
