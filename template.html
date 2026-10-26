@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LingoWorld by Arshaad — All Languages Translator</title>
+<meta name="description" content="Free translator for 100+ languages of the world, with a special Roman Urdu mode. No login, no install. By Arshaad.">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0b1020; color: #eef1ff; min-height: 100vh; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { text-align: center; padding: 30px 10px 8px; }
+  .logo { font-size: 44px; }
+  h1 { font-size: 38px; letter-spacing: .5px; background: linear-gradient(90deg,#38bdf8,#a78bfa,#34d399); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .by { margin-top: 4px; color: #fbbf24; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; }
+  .tag { margin-top: 10px; color: #aab3d6; font-size: 16px; }
+  .badges { margin: 16px 0 6px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .badge { background: #171d38; border: 1px solid #2a3363; color: #c7cdf5; padding: 6px 12px; border-radius: 999px; font-size: 13px; }
+  .badge.gold { border-color: #8a6d1f; color: #fcd34d; background: #241d05; }
+  .card { background: #121830; border: 1px solid #232b52; border-radius: 18px; padding: 18px; margin-top: 18px; box-shadow: 0 12px 32px rgba(0,0,0,.35); }
+  .row { display: flex; gap: 10px; align-items: stretch; }
+  .grow { flex: 1; }
+  label { display: block; font-size: 13px; color: #93a0cf; margin-bottom: 6px; font-weight: 600; }
+  select, textarea { width: 100%; background: #0b1020; color: #eef1ff; border: 1px solid #2a3363; border-radius: 12px; padding: 12px; font-size: 16px; }
+  textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
+  select:focus, textarea:focus { outline: 2px solid #38bdf8; border-color: transparent; }
+  .swap { align-self: end; background: #1d2650; color: #fff; border: 1px solid #2f3a78; width: 46px; height: 46px; border-radius: 50%; font-size: 20px; cursor: pointer; flex: none; }
+  .swap:hover { background: #27336b; }
+  .btn { background: linear-gradient(90deg,#0284c7,#7c3aed); color: #fff; border: none; border-radius: 12px; padding: 14px 22px; font-size: 17px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 14px; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn:disabled { opacity: .55; cursor: wait; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tool { background: #1a2148; color: #dbe1ff; border: 1px solid #2c376e; padding: 9px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+  .tool:hover { background: #232c5c; }
+  .meta { display: flex; justify-content: space-between; color: #7d88b8; font-size: 13px; margin-top: 6px; }
+  .status { min-height: 22px; margin-top: 10px; font-size: 14px; color: #7dd3fc; }
+  .status.err { color: #fca5a5; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .chip { background: #171d38; border: 1px dashed #39447e; color: #c7cdf5; padding: 7px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; }
+  .chip:hover { border-style: solid; color: #fff; }
+  .section-title { font-size: 19px; margin-bottom: 8px; }
+  .muted { color: #aab3d6; font-size: 15px; line-height: 1.65; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 12px; margin-top: 12px; }
+  .feat { background: #0f1530; border: 1px solid #232b52; border-radius: 14px; padding: 14px; }
+  .feat b { display: block; margin-bottom: 5px; font-size: 16px; }
+  .feat span { color: #aab3d6; font-size: 14px; line-height: 1.55; }
+  footer { text-align: center; color: #7d88b8; margin-top: 30px; font-size: 14px; line-height: 1.8; }
+  footer b { color: #fbbf24; }
+  [dir="rtl"] { text-align: right; }
+  @media (max-width: 640px) { h1 { font-size: 30px; } .row { flex-direction: column; } .swap { align-self: center; transform: rotate(90deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🌍</div>
+    <h1>LingoWorld</h1>
+    <div class="by">by Arshaad</div>
+    <p class="tag">Translate between the languages of the whole world — free, no login, no install.</p>
+    <div class="badges">
+      <span class="badge" id="langCount">100+ languages</span>
+      <span class="badge gold">★ Special: Roman Urdu</span>
+      <span class="badge">Auto-detect</span>
+      <span class="badge">Listen 🔊</span>
+      <span class="badge">Share on WhatsApp</span>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="row">
+      <div class="grow">
+        <label for="srcLang">From</label>
+        <select id="srcLang"></select>
+      </div>
+      <button class="swap" id="swapBtn" title="Swap languages">⇄</button>
+      <div class="grow">
+        <label for="tgtLang">To</label>
+        <select id="tgtLang"></select>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <label for="inputText">Your text</label>
+      <textarea id="inputText" placeholder="Type or paste text in any language… For Roman Urdu, pick “Roman Urdu (Special)” on the left, or just type — we try to detect it."></textarea>
+      <div class="meta"><span id="detected"></span><span id="charCount">0 characters</span></div>
+    </div>
+
+    <div class="chips" id="examples">
+      <button class="chip" data-ex="Hello, how are you?">Hello, how are you?</button>
+      <button class="chip" data-ex="mujhe kal ghar jana hai">mujhe kal ghar jana hai (Roman Urdu)</button>
+      <button class="chip" data-ex="Thank you very much for your help.">Thank you very much for your help.</button>
+      <button class="chip" data-ex="aap ka din kaisa guzra">aap ka din kaisa guzra (Roman Urdu)</button>
+    </div>
+
+    <button class="btn" id="translateBtn">Translate</button>
+    <div class="status" id="status"></div>
+
+    <div style="margin-top:8px">
+      <label for="outputText">Translation</label>
+      <textarea id="outputText" readonly placeholder="Your translation will appear here…"></textarea>
+      <div class="tools">
+        <button class="tool" id="speakOut">🔊 Listen to translation</button>
+        <button class="tool" id="speakIn">🔈 Listen to original</button>
+        <button class="tool" id="copyBtn">📋 Copy translation</button>
+        <button class="tool" id="waBtn">🟢 Share on WhatsApp</button>
+        <button class="tool" id="clearBtn">✖ Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Why LingoWorld?</div>
+    <p class="muted">Big translators cover the famous languages of the world — and LingoWorld covers those too, 100+ of them, from English and Chinese to Arabic, French, Spanish and Urdu. But one language people write every day was missing everywhere: <b>Roman Urdu</b>, the Urdu written in English letters on every phone in Pakistan. LingoWorld has it built in as a special mode.</p>
+    <div class="grid">
+      <div class="feat"><b>🌐 Any language → any language</b><span>Pick any pair: English → Chinese, Arabic → Urdu, French → German, Urdu → English, and 100+ more.</span></div>
+      <div class="feat"><b>★ Roman Urdu special</b><span>Type “mujhe ghar jana hai” and get proper Urdu script — مجھے گھر جانا ہے — or translate it into any other language.</span></div>
+      <div class="feat"><b>🔊 Listen</b><span>Hear the translation spoken aloud, so you also learn how it sounds.</span></div>
+      <div class="feat"><b>🟢 Share in one tap</b><span>Send your translation to anyone on WhatsApp, with copy for everywhere else.</span></div>
+    </div>
+  </div>
+
+  <footer>
+    LingoWorld — made by <b>Arshaad</b><br>
+    Free for everyone. If it helped you, share it with a friend.
+  </footer>
+</div>
+
+<script>
+const ROMAN_DICT = __ROMAN_DICT__;
+const LANGS = [
+["af","Afrikaans","Afrikaans"],["sq","Albanian","Shqip"],["am","Amharic","አማርኛ"],["ar","Arabic","العربية"],
+["hy","Armenian","Հայերեն"],["as","Assamese","অসমীয়া"],["az","Azerbaijani","Azərbaycan"],["eu","Basque","Euskara"],
+["be","Belarusian","Беларуская"],["bn","Bengali","বাংলা"],["bho","Bhojpuri","भोजपुरी"],["bs","Bosnian","Bosanski"],
+["bg","Bulgarian","Български"],["ca","Catalan","Català"],["ceb","Cebuano","Cebuano"],["zh-CN","Chinese (Simplified)","简体中文"],
+["zh-TW","Chinese (Traditional)","繁體中文"],["hr","Croatian","Hrvatski"],["cs","Czech","Čeština"],["da","Danish","Dansk"],
+["dv","Dhivehi","ދިވެހި"],["nl","Dutch","Nederlands"],["en","English","English"],["eo","Esperanto","Esperanto"],
+["et","Estonian","Eesti"],["ee","Ewe","Eʋegbe"],["tl","Filipino","Filipino"],["fi","Finnish","Suomi"],
+["fr","French","Français"],["fy","Frisian","Frysk"],["gl","Galician","Galego"],["ka","Georgian","ქართული"],
+["de","German","Deutsch"],["el","Greek","Ελληνικά"],["gn","Guarani","Guarani"],["gu","Gujarati","ગુજરાતી"],
+["ht","Haitian Creole","Kreyòl"],["ha","Hausa","Hausa"],["haw","Hawaiian","ʻŌlelo Hawaiʻi"],["he","Hebrew","עברית"],
+["hi","Hindi","हिन्दी"],["hmn","Hmong","Hmong"],["hu","Hungarian","Magyar"],["is","Icelandic","Íslenska"],
+["ig","Igbo","Igbo"],["id","Indonesian","Bahasa Indonesia"],["ga","Irish","Gaeilge"],["it","Italian","Italiano"],
+["ja","Japanese","日本語"],["jv","Javanese","Basa Jawa"],["kn","Kannada","ಕನ್ನಡ"],["kk","Kazakh","Қазақша"],
+["km","Khmer","ខ្មែរ"],["rw","Kinyarwanda","Kinyarwanda"],["ko","Korean","한국어"],["ku","Kurdish (Kurmanji)","Kurdî"],
+["ckb","Kurdish (Sorani)","کوردی"],["ky","Kyrgyz","Кыргызча"],["lo","Lao","ລາວ"],["la","Latin","Latina"],
+["lv","Latvian","Latviešu"],["lt","Lithuanian","Lietuvių"],["lb","Luxembourgish","Lëtzebuergesch"],["mk","Macedonian","Македонски"],
+["mai","Maithili","मैथिली"],["mg","Malagasy","Malagasy"],["ms","Malay","Bahasa Melayu"],["ml","Malayalam","മലയാളം"],
+["mt","Maltese","Malti"],["mi","Maori","Māori"],["mr","Marathi","मराठी"],["mn","Mongolian","Монгол"],
+["my","Myanmar (Burmese)","မြန်မာ"],["ne","Nepali","नेपाली"],["no","Norwegian","Norsk"],["ny","Nyanja (Chichewa)","Chichewa"],
+["or","Odia","ଓଡ଼ିଆ"],["om","Oromo","Oromoo"],["ps","Pashto","پښتو"],["fa","Persian","فارسی"],
+["pl","Polish","Polski"],["pt","Portuguese","Português"],["pa","Punjabi","ਪੰਜਾਬੀ"],["qu","Quechua","Runasimi"],
+["ro","Romanian","Română"],["ru","Russian","Русский"],["sm","Samoan","Samoa"],["sa","Sanskrit","संस्कृतम्"],
+["gd","Scots Gaelic","Gàidhlig"],["sr","Serbian","Српски"],["st","Sesotho","Sesotho"],["sn","Shona","Shona"],
+["sd","Sindhi","سنڌي"],["si","Sinhala","සිංහල"],["sk","Slovak","Slovenčina"],["sl","Slovenian","Slovenščina"],
+["so","Somali","Soomaali"],["es","Spanish","Español"],["su","Sundanese","Basa Sunda"],["sw","Swahili","Kiswahili"],
+["sv","Swedish","Svenska"],["tg","Tajik","Тоҷикӣ"],["ta","Tamil","தமிழ்"],["tt","Tatar","Татар"],
+["te","Telugu","తెలుగు"],["th","Thai","ไทย"],["ti","Tigrinya","ትግርኛ"],["ts","Tsonga","Xitsonga"],
+["tr","Turkish","Türkçe"],["tk","Turkmen","Türkmen"],["ak","Twi","Twi"],["uk","Ukrainian","Українська"],
+["ur","Urdu","اردو"],["ug","Uyghur","ئۇيغۇرچە"],["uz","Uzbek","O'zbek"],["vi","Vietnamese","Tiếng Việt"],
+["cy","Welsh","Cymraeg"],["xh","Xhosa","isiXhosa"],["yi","Yiddish","ייִדיש"],["yo","Yoruba","Yorùbá"],["zu","Zulu","isiZulu"]
+];
+const RTL = new Set(["ar","fa","he","ps","sd","ug","ur","yi","ckb","dv"]);
+const nameOf = code => { const l = LANGS.find(x => x[0] === code); return l ? l[1] : code; };
+const $ = id => document.getElementById(id);
+
+function fillSelects() {
+  const src = $("srcLang"), tgt = $("tgtLang");
+  src.innerHTML = '<option value="auto">Auto-detect</option><option value="rom-ur">Roman Urdu (Special) ★</option>';
+  tgt.innerHTML = '<option value="rom-ur">Roman Urdu (Special) ★</option>';
+  for (const [code, name, native] of LANGS) {
+    src.insertAdjacentHTML("beforeend", `<option value="${code}">${name} — ${native}</option>`);
+    tgt.insertAdjacentHTML("beforeend", `<option value="${code}">${name} — ${native}</option>`);
+  }
+  src.value = "auto"; tgt.value = "ur";
+  $("langCount").textContent = (LANGS.length + 1) + " languages";
+}
+const REVERSE_DICT = {};
+for (const [roman, urdu] of Object.entries(ROMAN_DICT)) if (!(urdu in REVERSE_DICT)) REVERSE_DICT[urdu] = roman;
+
+function transliterate(text) {
+  return text.replace(/[A-Za-z']+/g, w => ROMAN_DICT[w.toLowerCase()] || w);
+}
+function reverseTransliterate(text) {
+  return text.split(/\s+/).map(w => REVERSE_DICT[w] || w).join(" ");
+}
+function looksLikeRomanUrdu(text) {
+  const words = (text.toLowerCase().match(/[a-z']+/g) || []);
+  if (words.length < 3) return false;
+  const known = words.filter(w => w in ROMAN_DICT).length;
+  return known >= 3 && known / words.length >= 0.35;
+}
+function splitText(text, max = 1100) {
+  const chunks = []; let cur = "";
+  for (const part of text.split(/(?<=[.!?۔\n])\s+/)) {
+    if ((cur + " " + part).length > max && cur) { chunks.push(cur); cur = part; } else cur = cur ? cur + " " + part : part;
+  }
+  if (cur) chunks.push(cur);
+  return chunks;
+}
+async function gtx(text, sl, tl) {
+  const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + encodeURIComponent(sl) + "&tl=" + encodeURIComponent(tl) + "&dt=t&q=" + encodeURIComponent(text);
+  const r = await fetch(url); if (!r.ok) throw new Error("gtx");
+  const j = await r.json();
+  return { text: j[0].map(s => s[0]).join(""), detected: j[2] };
+}
+async function mymemory(text, sl, tl) {
+  const pair = (sl === "auto" ? "en" : sl) + "|" + tl;
+  const out = [];
+  for (const c of splitText(text, 450)) {
+    const url = "https://api.mymemory.translated.net/get?q=" + encodeURIComponent(c) + "&langpair=" + encodeURIComponent(pair);
+    const r = await fetch(url); if (!r.ok) throw new Error("mm");
+    const j = await r.json(); out.push(j.responseData.translatedText);
+  }
+  return { text: out.join(" "), detected: sl === "auto" ? "" : sl };
+}
+async function apiTranslate(text, sl, tl) {
+  let detected = "";
+  const parts = [];
+  for (const c of splitText(text)) {
+    try { const res = await gtx(c, sl, tl); parts.push(res.text); detected = detected || res.detected; }
+    catch (e) { const res = await mymemory(c, sl, tl); parts.push(res.text); detected = detected || res.detected; }
+  }
+  return { text: parts.join(" "), detected };
+}
+function setStatus(msg, isErr) { const s = $("status"); s.textContent = msg || ""; s.className = "status" + (isErr ? " err" : ""); }
+
+async function doTranslate() {
+  const input = $("inputText").value.trim();
+  const src = $("srcLang").value, tgt = $("tgtLang").value;
+  $("detected").textContent = "";
+  if (!input) { setStatus("Please type something first.", true); return; }
+  const btn = $("translateBtn"); btn.disabled = true; btn.textContent = "Translating…"; setStatus("");
+  try {
+    let out = "", detectedLabel = "";
+    if (src === "rom-ur" || (src === "auto" && looksLikeRomanUrdu(input))) {
+      detectedLabel = "Roman Urdu (Special)";
+      const urduText = transliterate(input);
+      if (tgt === "ur") out = urduText;
+      else if (tgt === "rom-ur") out = input;
+      else out = (await apiTranslate(urduText, "ur", tgt)).text;
+    } else if (tgt === "rom-ur") {
+      const urduText = src === "ur" ? input : (await apiTranslate(input, src, "ur")).text;
+      out = reverseTransliterate(urduText);
+      if (src !== "auto") detectedLabel = nameOf(src);
+    } else if (src === tgt) {
+      out = input; detectedLabel = nameOf(src);
+    } else {
+      const res = await apiTranslate(input, src, tgt);
+      out = res.text;
+      detectedLabel = res.detected ? nameOf(res.detected) : "";
+    }
+    $("outputText").value = out;
+    $("outputText").dir = RTL.has(tgt) ? "rtl" : "ltr";
+    if (detectedLabel) $("detected").textContent = "Detected: " + detectedLabel;
+    setStatus("Done ✓");
+  } catch (e) {
+    setStatus("Translation could not load. Please check your internet connection and try again.", true);
+  }
+  btn.disabled = false; btn.textContent = "Translate";
+}
+function speak(text, code) {
+  if (!text) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = code === "rom-ur" ? "ur-PK" : code;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+fillSelects();
+$("translateBtn").addEventListener("click", doTranslate);
+$("swapBtn").addEventListener("click", () => {
+  const s = $("srcLang"), t = $("tgtLang");
+  const sv = s.value === "auto" ? "en" : s.value;
+  s.value = t.value; t.value = sv;
+  const inT = $("inputText"), outT = $("outputText");
+  if (outT.value) { inT.value = outT.value; outT.value = ""; $("charCount").textContent = inT.value.length + " characters"; }
+});
+$("inputText").addEventListener("input", e => $("charCount").textContent = e.target.value.length + " characters");
+$("copyBtn").addEventListener("click", async () => {
+  const out = $("outputText").value; if (!out) return;
+  try { await navigator.clipboard.writeText(out); setStatus("Copied ✓"); } catch (e) { setStatus("Copy failed — please select the text manually.", true); }
+});
+$("speakOut").addEventListener("click", () => speak($("outputText").value, $("tgtLang").value));
+$("speakIn").addEventListener("click", () => speak($("inputText").value, $("srcLang").value === "auto" ? "en" : $("srcLang").value));
+$("waBtn").addEventListener("click", () => {
+  const out = $("outputText").value; if (!out) { setStatus("Translate something first, then share it.", true); return; }
+  const msg = $("inputText").value.trim() + "\n→ " + out + "\n— via LingoWorld by Arshaad";
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+});
+$("clearBtn").addEventListener("click", () => { $("inputText").value = ""; $("outputText").value = ""; $("charCount").textContent = "0 characters"; setStatus(""); });
+document.querySelectorAll("#examples .chip").forEach(ch => ch.addEventListener("click", () => {
+  $("inputText").value = ch.dataset.ex; $("charCount").textContent = ch.dataset.ex.length + " characters";
+  if (ch.dataset.ex.includes("mujhe") || ch.dataset.ex.includes("aap ka din")) $("srcLang").value = "rom-ur";
+}));
+</script>
+</body>
+</html>
