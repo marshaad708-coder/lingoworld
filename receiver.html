@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Face Avatar Call — open in browser, no install</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; background:#0f1418; color:#e8ecef; margin:0; padding:16px; }
+  .wrap { max-width:720px; margin:0 auto; }
+  h1 { font-size:22px; margin:8px 0; }
+  p { line-height:1.5; color:#c4ccd2; }
+  textarea { width:100%; box-sizing:border-box; min-height:90px; border-radius:8px; border:1px solid #39434c; background:#171d22; color:#e8ecef; padding:10px; font-size:13px; }
+  button { background:#1f9d63; color:#fff; border:0; border-radius:8px; padding:12px 18px; font-size:16px; width:100%; margin:10px 0; cursor:pointer; }
+  button.secondary { background:#2a343c; }
+  video { width:100%; background:#000; border-radius:10px; }
+  #localVideo { width:34%; position:absolute; right:8px; bottom:8px; border:2px solid #39434c; }
+  .stage { position:relative; }
+  #status { background:#171d22; border:1px solid #39434c; border-radius:8px; padding:10px; min-height:20px; }
+  label { display:block; margin:10px 0; }
+  .step { font-weight:bold; color:#7ee787; margin-top:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Face Avatar Call</h1>
+  <p>You do <b>not</b> need to install any app. The caller uses the Face Avatar app;
+     you only need this page. The caller will appear as an animated avatar
+     (labelled “AI AVATAR EFFECT ACTIVE”) — you will never see their real camera.</p>
+
+  <div class="stage">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay playsinline muted></video>
+  </div>
+  <p id="status">Waiting. Follow the two steps below when the caller sends you a connection text.</p>
+
+  <p class="step">Step 1 — Paste the connection text the caller sent you</p>
+  <textarea id="offerIn" placeholder="Paste the whole connection text here"></textarea>
+  <label><input type="checkbox" id="sendMine" checked>
+    Also send my camera and microphone, so the caller can see and hear me</label>
+  <button id="connectBtn">Connect</button>
+
+  <p class="step">Step 2 — Send this answer text back to the caller</p>
+  <textarea id="answerOut" readonly placeholder="Your answer text will appear here after you press Connect"></textarea>
+  <button id="copyBtn" class="secondary">Copy answer text</button>
+
+  <p>Privacy: the call goes directly between the two phones/browsers. This page
+     does not record, save, or upload anything. A connection text works once —
+     for a new call, reload this page and use fresh texts.</p>
+</div>
+<script>
+"use strict";
+const statusEl = document.getElementById('status');
+const remoteVideo = document.getElementById('remoteVideo');
+const localVideo = document.getElementById('localVideo');
+const offerIn = document.getElementById('offerIn');
+const answerOut = document.getElementById('answerOut');
+let pc = null;
+let gathered = [];
+
+function setStatus(t) { statusEl.textContent = t; }
+
+document.getElementById('connectBtn').addEventListener('click', async () => {
+  const raw = offerIn.value.trim();
+  if (!raw) { setStatus('Paste the connection text from the caller first.'); return; }
+  let blob;
+  try { blob = JSON.parse(raw); } catch (e) {
+    setStatus('That text is not complete. Copy the whole connection text from the caller and paste it again.');
+    return;
+  }
+  if (blob.kind !== 'offer' || !blob.sdp) {
+    setStatus('That is not a call offer. Ask the caller to create a fresh connection text (offer) and send it again.');
+    return;
+  }
+  try {
+    if (pc) { try { pc.close(); } catch (e) {} }
+    gathered = [];
+    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    pc.onicecandidate = (e) => {
+      if (e.candidate) {
+        gathered.push({
+          sdpMid: e.candidate.sdpMid,
+          sdpMLineIndex: e.candidate.sdpMLineIndex,
+          candidate: e.candidate.candidate
+        });
+      }
+    };
+    pc.ontrack = (e) => {
+      if (e.streams && e.streams[0]) {
+        remoteVideo.srcObject = e.streams[0];
+        remoteVideo.play().catch(() => {});
+        setStatus('Connected. You are seeing the caller as an avatar.');
+      }
+    };
+    pc.onconnectionstatechange = () => {
+      setStatus('Call connection: ' + pc.connectionState + '.');
+    };
+
+    if (document.getElementById('sendMine').checked) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        localVideo.srcObject = stream;
+        stream.getTracks().forEach(t => pc.addTrack(t, stream));
+      } catch (e) {
+        setStatus('Camera/microphone not allowed — continuing so you can still see and hear the caller. (You can allow the camera in the browser and reload to be seen.)');
+      }
+    }
+
+    await pc.setRemoteDescription({ type: 'offer', sdp: blob.sdp });
+    const cands = blob.candidates || [];
+    for (const c of cands) {
+      try { await pc.addIceCandidate(c); } catch (e) {}
+    }
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    setStatus('Working… wait a few seconds, then copy the answer text below and send it back to the caller.');
+
+    await waitForIce(pc, 4000);
+    answerOut.value = JSON.stringify({
+      app: 'FaceAvatar', kind: 'answer',
+      sdp: pc.localDescription.sdp, candidates: gathered
+    });
+    setStatus('Answer text is ready below. Copy it and send it to the caller. The call will connect here as soon as they paste it.');
+  } catch (err) {
+    setStatus('Something went wrong: ' + err.message + ' — reload this page and try again with a fresh connection text.');
+  }
+});
+
+function waitForIce(pc, timeoutMs) {
+  if (pc.iceGatheringState === 'complete') return Promise.resolve();
+  return new Promise(resolve => {
+    const timer = setTimeout(done, timeoutMs);
+    function check() { if (pc.iceGatheringState === 'complete') done(); }
+    function done() { clearTimeout(timer); pc.removeEventListener('icegatheringstatechange', check); resolve(); }
+    pc.addEventListener('icegatheringstatechange', check);
+  });
+}
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  if (!answerOut.value) { setStatus('There is no answer text yet. Do step 1 first.'); return; }
+  try {
+    await navigator.clipboard.writeText(answerOut.value);
+    setStatus('Answer text copied. Now send it to the caller.');
+  } catch (e) {
+    answerOut.select();
+    document.execCommand('copy');
+    setStatus('Answer text copied. Now send it to the caller.');
+  }
+});
+</script>
+</body>
+</html>
